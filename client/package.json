@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^4.6.2",
     "antd": "^4.15.6",
     "axios": "^0.21.1",
     "core-js": "^3.6.4",
-    "formik": "^1.5.8",
+    "formik": "^2.2.6",
     "moment": "^2.24.0",
     "react": "^17.0.2",
     "react-app-polyfill": "^1.0.6",
