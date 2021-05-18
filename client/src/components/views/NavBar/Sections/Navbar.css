@@ -1,6 +1,9 @@
 @import '~antd/dist/antd.css';
 
 .menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0 20px;
   border-bottom: solid 1px #e8e8e8;
   overflow: auto;
