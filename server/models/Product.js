@@ -31,12 +31,26 @@ const productSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    continent: {
+    categories: {
       type: Number,
       default: 1,
     },
   },
   { timeStamp: true }
+);
+
+// 검색 옵션
+productSchema.index(
+  {
+    title: 'text',
+    description: 'text',
+  },
+  {
+    weights: {
+      title: 5,
+      description: 1,
+    },
+  }
 );
 
 const Product = mongoose.model('Product', productSchema);

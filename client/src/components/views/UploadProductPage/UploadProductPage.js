@@ -7,21 +7,21 @@ import axios from 'axios';
 const { Title } = Typography;
 const { TextArea } = Input;
 
-const continentOptions = [
-  { key: 1, value: '서울' },
-  { key: 2, value: '경기' },
-  { key: 3, value: '강원' },
-  { key: 4, value: '전라' },
-  { key: 5, value: '경상' },
-  { key: 6, value: '제주' },
-  { key: 7, value: '충청' },
+const categoriesOptions = [
+  { key: 1, value: '액션' },
+  { key: 2, value: '아케이드' },
+  { key: 3, value: '어드벤처' },
+  { key: 4, value: 'RPG' },
+  { key: 5, value: '레이싱' },
+  { key: 6, value: '시뮬레이션' },
+  { key: 7, value: '스포츠' },
 ];
 
 function UploadProductPage(props) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
-  const [continent, setContinent] = useState(1);
+  const [categories, setCategories] = useState(1);
   const [images, setImages] = useState([]);
 
   const titleChangeHandler = (e) => {
@@ -36,8 +36,8 @@ function UploadProductPage(props) {
     setPrice(e.currentTarget.value);
   };
 
-  const continentChangeHandler = (e) => {
-    setContinent(e.currentTarget.value);
+  const categoriesChangeHandler = (e) => {
+    setCategories(e.currentTarget.value);
   };
 
   const updateImages = (newImages) => {
@@ -45,7 +45,7 @@ function UploadProductPage(props) {
   };
 
   const submitHandler = () => {
-    if (!title || !description || !price || !continent || !images) {
+    if (!title || !description || !price || !categories || !images) {
       return alert('모든 칸을 입력해주세요');
     }
 
@@ -57,7 +57,7 @@ function UploadProductPage(props) {
       description,
       price,
       images,
-      continent,
+      categories,
     };
 
     axios.post('/api/product', body).then((response) => {
@@ -92,8 +92,8 @@ function UploadProductPage(props) {
         <Input type='number' value={price} onChange={priceChangeHandler} />
         <br />
         <br />
-        <select onChange={continentChangeHandler} value={continent}>
-          {continentOptions.map((option) => {
+        <select onChange={categoriesChangeHandler} value={categories}>
+          {categoriesOptions.map((option) => {
             return (
               <option key={option.key} value={option.key}>
                 {option.value}
