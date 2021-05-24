@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const { Product } = require('../models/Product');
 
 //=================================
 //             Product
@@ -26,6 +27,15 @@ router.post('/image', (req, res) => {
       filePath: res.req.file.path,
       fileName: res.req.file.filename,
     });
+  });
+});
+
+router.post('/', (req, res) => {
+  // 클라가 보낸 submit data를 저장
+  const product = new Product(req.body);
+  product.save((err) => {
+    if (err) return res.status(400).json({ success: false, err });
+    return res.status(200).json({ success: true });
   });
 });
 

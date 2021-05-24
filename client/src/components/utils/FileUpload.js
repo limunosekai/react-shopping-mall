@@ -4,7 +4,7 @@ import axios from 'axios';
 import { PlusOutlined } from '@ant-design/icons';
 import * as api from '../Config';
 
-function FileUpload() {
+function FileUpload(props) {
   const [images, setImages] = useState([]);
 
   const dropHandler = (files) => {
@@ -20,10 +20,21 @@ function FileUpload() {
       .then((response) => {
         if (response.data.success) {
           setImages([...images, response.data.filePath]);
+          props.refreshFunction([...images, response.data.filePath]);
         } else {
           alert('파일 저장 실패');
         }
       });
+  };
+
+  const deleteHandler = (image) => {
+    const currentIndex = images.indexOf(image);
+
+    let newImages = [...images];
+    newImages.splice(currentIndex, 1);
+
+    setImages(newImages);
+    props.refreshFunction(newImages);
   };
 
   return (
@@ -59,7 +70,7 @@ function FileUpload() {
         }}
       >
         {images.map((image, index) => (
-          <div key={index}>
+          <div key={index} onClick={() => deleteHandler(image)}>
             <img
               style={{ minWidth: '300px', width: '300px', height: '240px' }}
               src={`http://localhost:5000/${image}`}
