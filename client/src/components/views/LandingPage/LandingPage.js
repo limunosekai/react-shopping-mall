@@ -7,16 +7,43 @@ const { Meta } = Card;
 
 function LandingPage() {
   const [products, setProducts] = useState([]);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(8);
+  const [postSize, setPostSize] = useState(0);
 
-  useEffect(() => {
-    axios.post('/api/product/products').then((response) => {
+  const getProducts = (body) => {
+    axios.post('/api/product/products', body).then((response) => {
       if (response.data.success) {
-        setProducts(response.data.productInfo);
+        if (body.loadMore) {
+          setProducts([...products, ...response.data.productInfo]);
+        } else {
+          setProducts(response.data.productInfo);
+        }
+        setPostSize(response.data.postSize);
       } else {
         alert('상품 데이터 로딩 실패');
       }
     });
+  };
+
+  useEffect(() => {
+    let body = {
+      skip,
+      limit,
+    };
+    getProducts(body);
   }, []);
+
+  const loadMoreHandler = () => {
+    let skipCount = skip + limit;
+    let body = {
+      skip: skipCount,
+      limit,
+      loadMore: true,
+    };
+    getProducts(body);
+    setSkip(skipCount);
+  };
 
   const renderCards = products.map((product, index) => {
     return (
@@ -40,10 +67,17 @@ function LandingPage() {
       {/* Cards */}
 
       <Row gutter={[16, 16]}>{renderCards}</Row>
-
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button>더보기</Button>
-      </div>
+      {postSize >= limit && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '30px',
+          }}
+        >
+          <Button onClick={loadMoreHandler}>더보기</Button>
+        </div>
+      )}
     </div>
   );
 }
