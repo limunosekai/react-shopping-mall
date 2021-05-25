@@ -89,7 +89,7 @@ router.post('/products', (req, res) => {
 });
 
 router.get('/product_by_id', (req, res) => {
-  // productId로 상세 페이지 조회 후 클라에 전송
+  // productId로 상품정보 조회 후 클라에 전송 (상세페이지)
   let type = req.query.type;
   let productId = req.query.id;
 
@@ -102,16 +102,19 @@ router.get('/product_by_id', (req, res) => {
 });
 
 router.post('/product_by_id', (req, res) => {
-  // productId로 상세 페이지 조회 후 클라에 전송
+  // productId로 상품정보 조회 후 클라에 전송 (장바구니)
   let type = req.query.type;
   let productIds = req.query.id;
 
   if (type === 'array') {
     let ids = req.query.id.split(',');
-    productIds = ids;
+    productIds = ids.map((item) => {
+      return item;
+    });
   }
+  console.log(productIds);
 
-  Product.find({ _id: productIds })
+  Product.find({ _id: { $in: productIds } })
     .populate('writer')
     .exec((err, product) => {
       if (err) return res.status(400).send(err);

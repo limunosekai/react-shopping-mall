@@ -70,7 +70,7 @@ export function addToCart(productId) {
 
 export function getCartItems(cartItems, userCart) {
   const request = axios
-    .get(`/api/product/product_by_id?id=${cartItems}&type=array`)
+    .post(`/api/product/product_by_id?id=${cartItems}&type=array`)
     .then((response) => {
       // 각 상품 정보를 Product Collection에서 가져온 후
       // 각각 quantity를 넣어준다

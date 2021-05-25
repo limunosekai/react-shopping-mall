@@ -14,10 +14,9 @@ function DetailProductPage(props) {
       .get(`/api/product/product_by_id?id=${productId}&type=single`)
       .then((response) => {
         if (response.data.success) {
-          console.log(response.data);
           setProduct(response.data.product[0]);
         } else {
-          alert('상세정보 로딩 실패');
+          alert('상세 정보 로딩 실패');
         }
       });
   }, []);
