@@ -73,9 +73,9 @@ router.get('/logout', auth, (req, res) => {
 
 router.post('/addToCart', auth, (req, res) => {
   // User Collection의 모든 정보 조회
+  let duplicate = false;
   User.findOne({ _id: req.user._id }, (err, userInfo) => {
     // 이미 해당 상품이 존재하는지 분기
-    let duplicate = false;
     userInfo.cart.forEach((item) => {
       if (item.id === req.body.productId) {
         duplicate = true;

@@ -101,4 +101,22 @@ router.get('/product_by_id', (req, res) => {
     });
 });
 
+router.post('/product_by_id', (req, res) => {
+  // productId로 상세 페이지 조회 후 클라에 전송
+  let type = req.query.type;
+  let productIds = req.query.id;
+
+  if (type === 'array') {
+    let ids = req.query.id.split(',');
+    productIds = ids;
+  }
+
+  Product.find({ _id: productIds })
+    .populate('writer')
+    .exec((err, product) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).json({ success: true, product });
+    });
+});
+
 module.exports = router;
