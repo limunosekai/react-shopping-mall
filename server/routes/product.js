@@ -88,4 +88,17 @@ router.post('/products', (req, res) => {
   }
 });
 
+router.get('/product_by_id', (req, res) => {
+  // productId로 상세 페이지 조회 후 클라에 전송
+  let type = req.query.type;
+  let productId = req.query.id;
+
+  Product.find({ _id: productId })
+    .populate('writer')
+    .exec((err, product) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).send({ success: true, product });
+    });
+});
+
 module.exports = router;
