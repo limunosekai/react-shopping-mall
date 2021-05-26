@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { User } = require('../models/User');
 const { Product } = require('../models/Product');
+const { Payment } = require('../models/Payment');
 const { auth } = require('../middleware/auth');
+const async = require('async');
 
 //=================================
 //             User
@@ -143,6 +145,76 @@ router.get('/removeFromCart', auth, (req, res) => {
             cart,
           });
         });
+    }
+  );
+});
+
+router.post('/paymentSuccess', auth, (req, res) => {
+  let history = [];
+  let transactionData = {};
+  // history 간단한 결제 정보 생성
+  req.body.cartDetail.product.forEach((item) => {
+    history.push({
+      dateOfPurchase: Date.now(),
+      name: item.title,
+      id: item._id,
+      price: item.price,
+      quantity: item.quantity,
+      paymentId: req.body.paymentData.paymentId,
+    });
+  });
+  // 자세한 결제 정보 생성
+  transactionData.user = {
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+  };
+  transactionData.data = req.body.paymentData;
+  transactionData.product = history;
+
+  // user collection의 history 필드에 데이터 저장
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $push: { history: history }, $set: { cart: [] } },
+    { new: true },
+    (err, userInfo) => {
+      if (err) return res.json({ success: false, err });
+
+      // payment collection에 결제 정보 저장
+      const payment = new Payment(transactionData);
+      payment.save((err, doc) => {
+        if (err) return res.json({ success: false, err });
+
+        // product collection 안의 sold 필드 업데이트
+
+        // 상품별 개수
+        let products = [];
+        doc.product.forEach((item) => {
+          products.push({ id: item.id, quantity: item.quantity });
+        });
+
+        async.eachSeries(
+          products,
+          (item, callback) => {
+            Product.update(
+              { _id: item.id },
+              {
+                $inc: {
+                  sold: item.quantity,
+                },
+              },
+              { new: false },
+              callback
+            );
+          },
+          (err) => {
+            if (err) return res.status(400).json({ success: false, err });
+            return res
+              .status(200)
+              .json({ success: true, cart: userInfo.cart, cartDetail: [] });
+          }
+        );
+      });
     }
   );
 });

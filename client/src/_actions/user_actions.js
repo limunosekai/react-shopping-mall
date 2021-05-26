@@ -7,8 +7,9 @@ import {
   ADD_TO_CART,
   GET_CART_ITEMS,
   REMOVE_CART_ITEM,
+  PAYMENT_SUCCESS,
 } from './types';
-import { USER_SERVER } from '../components/Config.js';
+import { USER_SERVER, PRODUCT_SERVER } from '../components/Config.js';
 
 export function registerUser(dataToSubmit) {
   const request = axios
@@ -71,7 +72,7 @@ export function addToCart(productId) {
 
 export function getCartItems(cartItems, userCart) {
   const request = axios
-    .post(`/api/product/product_by_id?id=${cartItems}&type=array`)
+    .post(`${PRODUCT_SERVER}/product_by_id?id=${cartItems}&type=array`)
     .then((response) => {
       // 각 상품 정보를 Product Collection에서 가져온 후
       // 각각 quantity를 넣어준다
@@ -93,7 +94,7 @@ export function getCartItems(cartItems, userCart) {
 
 export function removeCartItem(productId) {
   const request = axios
-    .get(`/api/users/removeFromCart?id=${productId}`)
+    .get(`${USER_SERVER}/removeFromCart?id=${productId}`)
     .then((response) => {
       // productInfo, cart 정보를 조합해서 cartDetail 생성
       response.data.cart.forEach((item) => {
@@ -108,6 +109,17 @@ export function removeCartItem(productId) {
 
   return {
     type: REMOVE_CART_ITEM,
+    payload: request,
+  };
+}
+
+export function paymentSuccess(data) {
+  const request = axios
+    .post(`${USER_SERVER}/paymentSuccess`, data)
+    .then((response) => response.data);
+
+  return {
+    type: PAYMENT_SUCCESS,
     payload: request,
   };
 }
