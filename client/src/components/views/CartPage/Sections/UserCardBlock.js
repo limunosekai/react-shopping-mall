@@ -24,7 +24,11 @@ function UserCardBlock(props) {
         <td>{product.quantity} 개</td>
         <td>{product.price} 원</td>
         <td>
-          <Button type='default' danger>
+          <Button
+            type='default'
+            danger
+            onClick={() => props.removeItem(product._id)}
+          >
             삭제
           </Button>
         </td>

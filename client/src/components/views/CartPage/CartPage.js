@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { getCartItems } from '../../../_actions/user_actions';
+import { getCartItems, removeCartItem } from '../../../_actions/user_actions';
 import UserCardBlock from './Sections/UserCardBlock';
 
 function CartPage(props) {
@@ -33,11 +33,27 @@ function CartPage(props) {
     setTotal(amount);
   };
 
+  let removeFromCart = (productId) => {
+    dispatch(removeCartItem(productId)).then((response) => {
+      // productInfo, cart 정보를 조합해서 cartDetail 생성
+      response.payload.cart.forEach((item) => {
+        response.payload.productInfo.forEach((product, i) => {
+          if (item.id === product._id) {
+            response.payload.productInfo[i].quantity = item.quantity;
+          }
+        });
+      });
+
+      return response.payload;
+    });
+  };
+
   return (
     <div style={{ width: '85%', margin: '3rem auto' }}>
       <h1>My Cart</h1>
       <div>
         <UserCardBlock
+          removeItem={removeFromCart}
           products={props.user.cartDetail && props.user.cartDetail.product}
         />
       </div>

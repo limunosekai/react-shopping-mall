@@ -112,7 +112,6 @@ router.post('/product_by_id', (req, res) => {
       return item;
     });
   }
-  console.log(productIds);
 
   Product.find({ _id: { $in: productIds } })
     .populate('writer')

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../models/User');
-
+const { Product } = require('../models/Product');
 const { auth } = require('../middleware/auth');
 
 //=================================
@@ -81,39 +81,70 @@ router.post('/addToCart', auth, (req, res) => {
         duplicate = true;
       }
     });
-  });
 
-  // 상품이 있을 때
-  if (duplicate) {
-    User.findOneAndUpdate(
-      { _id: req.user._id, 'cart.id': req.body.productId },
-      { $inc: { 'cart.$.quantity': 1 } },
-      { new: true }, // 업데이트 된 정보를 받기 위한 옵션
-      (err, userInfo) => {
-        if (err) return res.status(400).json({ success: false, err });
-        return res.status(200).send(userInfo.cart);
-      }
-    );
-  } else {
-    // 상품이 없을 때
-    User.findOneAndUpdate(
-      { _id: req.user._id },
-      {
-        $push: {
-          cart: {
-            id: req.body.productId,
-            quantity: 1,
-            date: Date.now(),
+    // 상품이 있을 때
+    if (duplicate) {
+      User.findOneAndUpdate(
+        { _id: req.user._id, 'cart.id': req.body.productId },
+        { $inc: { 'cart.$.quantity': 1 } },
+        { new: true }, // 업데이트 된 정보를 받기 위한 옵션
+        (err, userInfo) => {
+          if (err) return res.status(400).json({ success: false, err });
+          return res.status(200).send(userInfo.cart);
+        }
+      );
+    } else {
+      // 상품이 없을 때
+      User.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $push: {
+            cart: {
+              id: req.body.productId,
+              quantity: 1,
+              date: Date.now(),
+            },
           },
         },
+        { new: true },
+        (err, userInfo) => {
+          if (err) return res.status(400).json({ success: false, err });
+          return res.status(200).send(userInfo.cart);
+        }
+      );
+    }
+  });
+});
+
+router.get('/removeFromCart', auth, (req, res) => {
+  // cart 안의 상품 삭제
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    {
+      $pull: {
+        cart: { id: req.query.id },
       },
-      { new: true },
-      (err, userInfo) => {
-        if (err) return res.status(400).json({ success: false, err });
-        return res.status(200).send(userInfo.cart);
-      }
-    );
-  }
+    },
+    { new: true },
+    (err, userInfo) => {
+      if (err) return res.status(400).send(err);
+      let cart = userInfo.cart;
+      let array = cart.map((item) => {
+        return item.id;
+      });
+
+      // product collection 안의 상품 정보 가져오기
+      Product.find({ _id: { $in: array } })
+        .populate('writer')
+        .exec((err, productInfo) => {
+          if (err) return res.status(400).send(err);
+          return res.status(200).json({
+            productInfo,
+            cart,
+          });
+        });
+    }
+  );
 });
 
 module.exports = router;
