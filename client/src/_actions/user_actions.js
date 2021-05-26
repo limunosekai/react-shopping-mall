@@ -95,6 +95,14 @@ export function removeCartItem(productId) {
   const request = axios
     .get(`/api/users/removeFromCart?id=${productId}`)
     .then((response) => {
+      // productInfo, cart 정보를 조합해서 cartDetail 생성
+      response.data.cart.forEach((item) => {
+        response.data.productInfo.forEach((product, i) => {
+          if (item.id === product._id) {
+            response.data.productInfo[i].quantity = item.quantity;
+          }
+        });
+      });
       return response.data;
     });
 

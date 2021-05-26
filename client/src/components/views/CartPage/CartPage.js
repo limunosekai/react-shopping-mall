@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getCartItems, removeCartItem } from '../../../_actions/user_actions';
 import UserCardBlock from './Sections/UserCardBlock';
+import { Empty } from 'antd';
 
 function CartPage(props) {
   const dispatch = useDispatch();
   const [total, setTotal] = useState(0);
+  const [showTotal, setShowTotal] = useState(false);
 
   useEffect(() => {
     let cartItems = [];
@@ -31,20 +33,14 @@ function CartPage(props) {
       (item) => (amount += parseInt(item.price, 10) * item.quantity)
     );
     setTotal(amount);
+    setShowTotal(true);
   };
 
   let removeFromCart = (productId) => {
     dispatch(removeCartItem(productId)).then((response) => {
-      // productInfo, cart 정보를 조합해서 cartDetail 생성
-      response.payload.cart.forEach((item) => {
-        response.payload.productInfo.forEach((product, i) => {
-          if (item.id === product._id) {
-            response.payload.productInfo[i].quantity = item.quantity;
-          }
-        });
-      });
-
-      return response.payload;
+      if (response.payload.productInfo.length <= 0) {
+        setShowTotal(false);
+      }
     });
   };
 
@@ -57,11 +53,18 @@ function CartPage(props) {
           products={props.user.cartDetail && props.user.cartDetail.product}
         />
       </div>
-      <div style={{ width: '90%', margin: '3rem auto', textAlign: 'center' }}>
-        <h2>
-          결제하실 총 금액:<strong> {total} 원</strong>
-        </h2>
-      </div>
+      {showTotal ? (
+        <div style={{ width: '90%', margin: '3rem auto', textAlign: 'center' }}>
+          <h2>
+            결제하실 총 금액:<strong> {total} 원</strong>
+          </h2>
+        </div>
+      ) : (
+        <>
+          <br />
+          <Empty description={false} />
+        </>
+      )}
     </div>
   );
 }
