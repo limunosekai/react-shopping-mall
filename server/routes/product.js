@@ -97,6 +97,8 @@ router.get('/product_by_id', (req, res) => {
     .populate('writer')
     .exec((err, product) => {
       if (err) return res.status(400).send(err);
+      product[0].views++;
+      product[0].save();
       return res.status(200).send({ success: true, product });
     });
 });

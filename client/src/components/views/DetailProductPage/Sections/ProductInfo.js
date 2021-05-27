@@ -5,14 +5,14 @@ import { addToCart } from '../../../../_actions/user_actions';
 
 function ProductInfo(props) {
   const dispatch = useDispatch();
-
+  console.log(props);
   const clickHandler = () => {
     // 상품 정보를 DB Cart 필드에 추가
     dispatch(addToCart(props.detail._id));
   };
 
   return (
-    <div>
+    <div style={{ textAlign: 'center' }}>
       <Descriptions title='상품 정보' bordered>
         <Descriptions.Item label='가격' contentStyle={{ fontSize: '1.25rem' }}>
           {props.detail.price} 원
@@ -36,16 +36,20 @@ function ProductInfo(props) {
       <br />
       <br />
       <br />
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button
-          size='large'
-          shape='round'
-          type='primary'
-          onClick={clickHandler}
-        >
-          Add to Cart
-        </Button>
-      </div>
+      {props.userInfo.userData && props.userInfo.userData.isAuth ? (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button
+            size='large'
+            shape='round'
+            type='primary'
+            onClick={clickHandler}
+          >
+            Add to Cart
+          </Button>
+        </div>
+      ) : (
+        <span>로그인 후 구매가 가능합니다</span>
+      )}
     </div>
   );
 }
